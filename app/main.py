@@ -1,11 +1,66 @@
+import os
 from fastapi import FastAPI, Query
 from app.database import get_connection
 from fastapi.templating import Jinja2Templates
 from fastapi.requests import Request
 
 
+def init_db_if_needed():
+    db_exists = os.path.exists("plots.db")
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    # Create table if it doesn't exist
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS plots (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            state TEXT,
+            city TEXT,
+            locality TEXT,
+            plot_size_sqft INTEGER,
+            price_per_sqft INTEGER,
+            total_price INTEGER,
+            status TEXT,
+            owner_type TEXT,
+            contact TEXT,
+            description TEXT
+        )
+    """)
+
+    # If DB is new, load initial data
+    if not db_exists:
+        import pandas as pd
+        df = pd.read_excel("data/plots_source.xlsx")
+
+        for _, r in df.iterrows():
+            cursor.execute("""
+                INSERT INTO plots (
+                    state, city, locality,
+                    plot_size_sqft, price_per_sqft, total_price,
+                    status, owner_type, contact, description
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                r["state"],
+                r["city"],
+                r["locality"],
+                int(r["plot_size_sqft"]),
+                int(r["price_per_sqft"]),
+                int(r["total_price"]),
+                r["status"],
+                r["owner_type"],
+                r["contact"],
+                r["description"]
+            ))
+
+    conn.commit()
+    conn.close()
+
+
 app = FastAPI(title="Plots Locator")
 templates = Jinja2Templates(directory="app/templates")
+init_db_if_needed()
 
 
 @app.get("/")
