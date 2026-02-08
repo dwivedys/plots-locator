@@ -12,6 +12,12 @@
 </head>
 <body>
 
+    <p style="color:#555; max-width:700px;">
+        Plots Locator helps you discover residential plot availability by city,
+        plot size, and locality. Use the search below to explore available plots
+        and compare prices across locations.
+    </p>
+
 <h2>Search Plots</h2>
 
 <form method="get" action="/">
@@ -22,7 +28,7 @@
     <button type="submit">Search</button>
 </form>
 
-{% if results %}
+{% if results and results|length > 0 %}
 <table>
     <tr>
         <th>City</th>
@@ -41,7 +47,13 @@
     </tr>
     {% endfor %}
 </table>
+
+{% elif results is not none %}
+<p style="margin-top:20px; color:#cc0000;">
+    !!No plots found for this city / criteria.!!
+</p>
 {% endif %}
+
 
 </body>
 </html>
