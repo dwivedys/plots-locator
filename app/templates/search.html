@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Plots Locator</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        input { margin: 5px; padding: 6px; }
+        button { padding: 6px 12px; }
+        table { margin-top: 20px; border-collapse: collapse; }
+        th, td { border: 1px solid #ccc; padding: 8px; }
+    </style>
+</head>
+<body>
+
+<h2>Search Plots</h2>
+
+<form method="get" action="/">
+    City: <input name="city" required>
+    Min Size: <input name="min_size" type="number">
+    Max Size: <input name="max_size" type="number">
+    Locality: <input name="locality">
+    <button type="submit">Search</button>
+</form>
+
+{% if results %}
+<table>
+    <tr>
+        <th>City</th>
+        <th>Locality</th>
+        <th>Size</th>
+        <th>Price / sqft</th>
+        <th>Total Price</th>
+    </tr>
+    {% for r in results %}
+    <tr>
+        <td>{{ r.city }}</td>
+        <td>{{ r.locality }}</td>
+        <td>{{ r.plot_size_sqft }}</td>
+        <td>{{ r.price_per_sqft }}</td>
+        <td>{{ r.total_price }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+
+</body>
+</html>
